@@ -1,8 +1,9 @@
 import socket
 import threading
 
-clients = {} 
-lock = threading.Lock()  
+clients = {}
+lock = threading.Lock()
+
 
 def broadcast(message, sender_conn=None):
     """Mengirim pesan ke semua client kecuali pengirimnya."""
@@ -13,6 +14,7 @@ def broadcast(message, sender_conn=None):
                     conn.send(message.encode("utf-8"))
                 except:
                     pass
+
 
 def handle_client(conn, addr):
     """Mengelola komunikasi dengan satu client"""
@@ -33,7 +35,7 @@ def handle_client(conn, addr):
                 conn.send("Sesi chat selesai.".encode("utf-8"))
                 break
             pesan = f"[{nama_client}]: {buffer}"
-            print(pesan) 
+            print(pesan)
             broadcast(pesan, conn)
     except:
         pass
@@ -45,15 +47,17 @@ def handle_client(conn, addr):
     print(f"{nama_client} keluar dari chat.")
     broadcast(f"{nama_client} telah keluar dari chat.")
 
+
 def server_chat():
     """Memungkinkan server untuk mengirim pesan ke client."""
     while True:
-        pesan = input()  
+        pesan = input()
         if pesan.lower() == "exit":
             print("Server keluar...")
             broadcast("Server telah keluar.")
             break
         broadcast(f"[Server]: {pesan}")
+
 
 if __name__ == "__main__":
     ip = "localhost"
@@ -64,7 +68,7 @@ if __name__ == "__main__":
     server.bind((ip, port))
     server.listen()
     print(f"Server berjalan di {ip}:{port}\nMenunggu client...")
-    threading.Thread(target=server_chat, daemon=True).start()  
+    threading.Thread(target=server_chat, daemon=True).start()
     while True:
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
